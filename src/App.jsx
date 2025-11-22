@@ -60,6 +60,48 @@ const defaultSearchResult = {
   ),
 };
 
+const heroPreview = [
+  generatePlaceholder('Live Boards', '#f6d365', '#fda085'),
+  generatePlaceholder('Photo Memory', '#c471ed', '#f64f59'),
+  generatePlaceholder('Video AI', '#6dd5ed', '#2193b0'),
+];
+
+const heroStats = [
+  { label: 'Search intelligence', value: 'Domain aware' },
+  { label: 'Creative kits', value: '5+ tools' },
+  { label: 'Photo memory', value: 'Instant saves' },
+];
+
+const searchInsights = [
+  {
+    title: 'Domain navigation',
+    detail: 'Pixelbit shifts into navigation mode the moment a valid domain is detected.',
+  },
+  {
+    title: 'Visual discovery',
+    detail: 'Three vivid reference images pair with a short summary for topic queries.',
+  },
+  {
+    title: 'Status-first',
+    detail: 'Live hints keep you oriented on what the search rail is doing.',
+  },
+];
+
+const shoppingHighlights = [
+  {
+    title: 'Media vault',
+    detail: 'Save uploads or captured snapshots locally in photo memory.',
+  },
+  {
+    title: 'Creation lane',
+    detail: 'Queue a mocked video-making AI request or add automation kits.',
+  },
+  {
+    title: 'Responsive grid',
+    detail: 'Tool cards glow when selected and stack neatly on smaller screens.',
+  },
+];
+
 const toolCatalog = [
   {
     id: 'photo-memory',
@@ -184,15 +226,24 @@ const SearchPanel = () => {
           Search
         </button>
       </form>
-      <p id="search-hint" className="muted" aria-live="polite">
-        {status || 'Pixelbit previews three images and a short summary for topic searches.'}
-      </p>
+      <div className="status-bar" role="status" aria-live="polite">
+        <span className="pill soft">Discovery rail</span>
+        <p>{status || 'Pixelbit previews three images and a short summary for topic searches.'}</p>
+        <span className="pulse" aria-hidden="true" />
+      </div>
 
       <div className="result-card">
         <div className="result-header">
-          <h3>{result.title}</h3>
-          <p className="muted">{result.summary}</p>
+          <div>
+            <p className="eyebrow muted">Search outcome</p>
+            <h3>{result.title}</h3>
+          </div>
+          <div className="result-meta">
+            <span className="pill">Visual set</span>
+            <span className="pill">Summary</span>
+          </div>
         </div>
+        <p className="muted result-summary">{result.summary}</p>
         <div className="image-grid" aria-label="Representative images">
           {result.images.map((image, index) => (
             <figure key={image} className="image-card">
@@ -201,6 +252,15 @@ const SearchPanel = () => {
             </figure>
           ))}
         </div>
+      </div>
+
+      <div className="insight-grid" aria-label="Search experience details">
+        {searchInsights.map((insight) => (
+          <article key={insight.title} className="insight-card">
+            <h4>{insight.title}</h4>
+            <p className="muted">{insight.detail}</p>
+          </article>
+        ))}
       </div>
     </section>
   );
@@ -217,6 +277,7 @@ const ShoppingPanel = () => {
   ]);
   const [videoStatus, setVideoStatus] = useState('Idle');
   const [uploadStatus, setUploadStatus] = useState('Waiting for a photo.');
+  const selectedLabels = toolCatalog.filter((tool) => selectedTools.has(tool.id));
 
   const toggleSelection = (id) => {
     setSelectedTools((current) => {
@@ -277,6 +338,22 @@ const ShoppingPanel = () => {
         </div>
         <div className="selection-pill" aria-live="polite">
           {selectedTools.size} tool{selectedTools.size === 1 ? '' : 's'} selected
+        </div>
+      </div>
+
+      <div className="highlight-card" role="presentation">
+        <div>
+          <p className="eyebrow muted">Design-forward shopping</p>
+          <h3>Glowing tool cards with responsive grids</h3>
+          <p className="muted">Curated utility rows, shimmering selections, and a playful preview rail.</p>
+        </div>
+        <div className="highlight-grid" aria-label="Shopping highlights">
+          {shoppingHighlights.map((item) => (
+            <div key={item.title} className="micro-card">
+              <p className="muted">{item.title}</p>
+              <h4>{item.detail}</h4>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -347,6 +424,29 @@ const ShoppingPanel = () => {
             </ul>
           </div>
         </div>
+
+        <div className="action-card selection-card">
+          <h3>Selection summary</h3>
+          <p className="muted">
+            Your chosen tools shimmer here. Extend this to feed a real checkout or workspace setup.
+          </p>
+          <div className="chip-row" aria-live="polite">
+            {selectedLabels.length === 0 ? (
+              <span className="pill soft">No tools selected</span>
+            ) : (
+              selectedLabels.map((tool) => (
+                <span key={tool.id} className="pill">
+                  {tool.name}
+                </span>
+              ))
+            )}
+          </div>
+          <div className="memory-preview" aria-label="Hero preview visuals">
+            {heroPreview.map((image, index) => (
+              <img key={image} src={image} alt={`Pixelbit preview ${index + 1}`} loading="lazy" />
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -359,28 +459,68 @@ const App = () => {
   return (
     <div className="app-shell">
       <header className="hero">
-        <div>
-          <p className="eyebrow">Pixelbit UI</p>
-          <h1>Find, shop, and capture creative signals</h1>
-          <p className="muted">
-            Lightweight Pixelbit experience with domain-aware search, mock shopping tools, photo
-            memory, and a stubbed video-making AI lane.
-          </p>
-          <nav className="tab-nav" aria-label="Primary">
-            {[
-              { id: 'search', label: 'Search' },
-              { id: 'shopping', label: 'Shopping' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                className={`tab ${activeTab === tab.id ? 'active' : ''}`}
-                aria-pressed={activeTab === tab.id}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
+        <div className="hero-grid">
+          <div className="hero-copy">
+            <p className="eyebrow">Pixelbit UI</p>
+            <h1>Find, shop, and capture creative signals</h1>
+            <p className="muted">
+              A luminous interface with domain-aware search, curated shopping, photo memory,
+              and a shimmering AI video rail ready for deeper integrations.
+            </p>
+            <div className="hero-stats" aria-label="Pixelbit capabilities">
+              {heroStats.map((stat) => (
+                <div key={stat.label} className="stat-card">
+                  <p className="muted">{stat.label}</p>
+                  <h3>{stat.value}</h3>
+                </div>
+              ))}
+            </div>
+            <nav className="tab-nav" aria-label="Primary">
+              {[
+                { id: 'search', label: 'Search' },
+                { id: 'shopping', label: 'Shopping' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  className={`tab ${activeTab === tab.id ? 'active' : ''}`}
+                  aria-pressed={activeTab === tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          <div className="hero-visual" aria-label="Pixelbit preview">
+            <div className="glass-card">
+              <div className="spark-line" aria-hidden="true" />
+              <p className="eyebrow muted">Photo memory</p>
+              <h3>Gradient captures</h3>
+              <p className="muted">
+                Uploads and demo captures cascade into this preview rail. Extend with your storage
+                or CDN of choice.
+              </p>
+              <div className="mini-grid">
+                {heroPreview.map((image, index) => (
+                  <figure key={image}>
+                    <img src={image} alt={`Colorful preview ${index + 1}`} loading="lazy" />
+                    <figcaption className="sr-only">Gradient preview {index + 1}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            </div>
+            <div className="glass-card alt">
+              <p className="eyebrow muted">Live status</p>
+              <h3>Video AI stub</h3>
+              <p className="muted">Tap into the shopping tab to queue a shimmering AI render.</p>
+              <div className="spark-pills">
+                <span className="pill">Capture</span>
+                <span className="pill">Shop</span>
+                <span className="pill">Render</span>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
